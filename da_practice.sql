@@ -47,3 +47,31 @@ WHERE "StockCode" ~'[0-9]' AND "Quantity" <0 AND "Quantity">-1000
 GROUP BY "Description"
 ORDER BY "LostRevenue" ASC
 LIMIT 10;
+
+
+-- Revenue by country
+SELECT "Country",SUM("Quantity"*"UnitPrice") AS "TotalRevenue"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~'[0-9]'
+GROUP BY "Country"
+ORDER BY "TotalRevenue" DESC;
+
+
+--Revenue by month
+SELECT TO_CHAR(TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI'),'YYYY-MM') AS "Month",
+SUM("Quantity"*"UnitPrice") AS "MonthlyRevenue"
+FROM  retail_project."OnlineRetailCSV"
+WHERE  "StockCode" ~'[0-9]'
+GROUP BY "Month"
+ORDER BY "Month";
+
+-- Latest invoice timestamp in Dec 2011 (shows which day the data stops)
+SELECT MAX("InvoiceDate")
+FROM retail_project."OnlineRetailCSV"
+WHERE "InvoiceDate" LIKE '12/%/2011%';
+
+-- List the distinct days with data between Sept and Nov 2011 (check for missing days)
+SELECT DISTINCT(TO_CHAR(TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI'),'MM/DD/YYYY')) AS "Days"
+FROM retail_project."OnlineRetailCSV"
+WHERE TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI') BETWEEN '2011-09-01' AND '2011-11-30'
+ORDER BY "Days";
