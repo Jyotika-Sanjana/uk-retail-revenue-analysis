@@ -37,6 +37,12 @@ behavior.
 T-LIGHT HOLDER" appear in both the top-revenue and top-returns 
 lists — meaning gross revenue overstates their actual profitability.
 
+**4**.Checked Revenue by country
+
+**5**.**Revenue trend over time (by month)**:Revenue showed strong month-over-month growth through late 2011, peaking in November (£1.43M). December 2011 appears to show a sharp drop, but this is a data artifact — the dataset only contains records through December 9th, not the full month, so this isn’t a genuine decline.
+
+**6**. **Also found**: Verified that September–November 2011 are complete months (consistent day coverage), confirming the revenue growth across this period is genuine — not an artifact of partial-month data, unlike December.
+
 ## Tools
 PostgreSQL, pgAdmin
 
