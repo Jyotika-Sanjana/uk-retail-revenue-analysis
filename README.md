@@ -33,7 +33,7 @@ back to its matching original order to confirm, then excluded
 extreme-quantity returns to get a cleaner view of real returns 
 behavior.
 
-**3. Also found: "REGENCY CAKESTAND 3 TIER" and "WHITE HANGING HEART 
+**3. Also found**: "REGENCY CAKESTAND 3 TIER" and "WHITE HANGING HEART 
 T-LIGHT HOLDER" appear in both the top-revenue and top-returns 
 lists — meaning gross revenue overstates their actual profitability.
 
