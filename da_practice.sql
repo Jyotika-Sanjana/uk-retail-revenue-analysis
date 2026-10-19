@@ -75,3 +75,49 @@ SELECT DISTINCT(TO_CHAR(TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI'),'MM/DD/YYYY
 FROM retail_project."OnlineRetailCSV"
 WHERE TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI') BETWEEN '2011-09-01' AND '2011-11-30'
 ORDER BY "Days";
+
+-- Top 10 individual orders by revenue in November 2011
+-- (grouped by InvoiceNo, not Description, to check order-level concentration 
+-- rather than product-level totals)
+SELECT "InvoiceNo",SUM("Quantity"*"UnitPrice") as "NovRevenue"
+FROM retail_project."OnlineRetailCSV"
+WHERE TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI') BETWEEN '2011-11-01' AND '2011-11-30' AND "StockCode" ~'[0-9]'
+GROUP BY "InvoiceNo"
+ORDER BY "NovRevenue" DESC
+LIMIT 10;
+
+-- Combined value of the top 2 orders, to check what % of November's 
+-- total revenue they represent (verifying the spike isn't order-concentrated)
+SELECT SUM("Quantity"*"UnitPrice") AS "TopordersTotal"
+FROM retail_project."OnlineRetailCSV"
+WHERE "InvoiceNo" IN ('574941', '576365')
+AND "StockCode" ~ '[0-9]';
+
+-- Top 10 customers by total spend (nulls excluded — these represent 
+-- transactions with no CustomerID recorded, not a real customer)
+SELECT "CustomerID", SUM("Quantity"*"UnitPrice") AS "TopCustomerSpend"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]' AND "CustomerID" IS NOT NULl
+GROUP BY "CustomerID"
+ORDER BY "TopCustomerSpend" DESC
+LIMIT 10;
+
+-- Verify top 2 customers' spend comes from many repeat orders, 
+-- not one large wholesale purchase
+SELECT "CustomerID", COUNT(DISTINCT("InvoiceNo" )) AS "Numorders"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]' AND "CustomerID" IN('14646','18102')
+GROUP BY "CustomerID"
+
+-- Average order value per top customer (TotalSpend / NumOrders)
+-- Note: AVG(Quantity*UnitPrice) would average per product line, not per 
+-- order, since each order spans multiple rows — this gives the wrong metric
+SELECT "CustomerID", 
+    SUM("Quantity"*"UnitPrice") AS "TotalSpend",
+    COUNT(DISTINCT "InvoiceNo") AS "NumOrders",
+    SUM("Quantity"*"UnitPrice") / COUNT(DISTINCT "InvoiceNo") AS "AvgOrderValue"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]' AND "CustomerID" IS NOT NULL
+GROUP BY "CustomerID"
+ORDER BY "TotalSpend" DESC
+LIMIT 10;
