@@ -42,9 +42,9 @@ lists — meaning gross revenue overstates their actual profitability.
 **5**.**Revenue trend over time (by month)**:
 Net product revenue: after returns and cancellations, excluding non-product entries such as postage and adjustments.
 
-Finding: Monthly revenue moved in a moderate range from December 2010 to August 2011, then rose sharply from September to November 2011, peaking in November. December 2011 appears to drop, but the data ends on 9 December. Revenue per day with sales in December 2011 is almost the same as November’s, so the drop is largely explained by missing days, not weaker sales.
-
-Recommendation: Plan stock, staffing and delivery capacity ahead of September to November, the strongest period in this dataset. Report December by revenue per day, not by monthly total, until a full month of data is available. With one year of data, confirm the seasonal pattern against a second year.
+- Finding: Monthly revenue moved in a moderate range from December 2010 to August 2011, then rose sharply from September to    November 2011, peaking in November. December 2011 appears to drop, but the data ends on 9 December. Revenue per day with     sales in December 2011 is almost the same as November’s, so the drop is largely explained by missing days, not weaker
+  sales.
+- Recommendation: Plan stock, staffing and delivery capacity ahead of September to November, the strongest period in this      dataset. Report December by revenue per day, not by monthly total, until a full month of data is available. With one year    of data, confirm the seasonal pattern against a second year.
 
 **6**. **Also found**: Verified that September–November 2011 are complete months (consistent day coverage), confirming the revenue growth across this period is genuine — not an artifact of partial-month data, unlike December.
 
