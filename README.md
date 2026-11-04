@@ -7,7 +7,7 @@ Analysis of a real e-commerce transaction dataset (UCI Online Retail,
 ~540K rows) using PostgreSQL to  analyse: top-selling products, data 
 quality issues, and returns impact on revenue.
 - Data-handling note :
-  Product revenue excludes non-product entries such as postage, discounts and adjustments, identified by stock-code pattern.   The raw data is kept unchanged, and all queries use one cleaned definition (a view) so results stay consistent
+  Product revenue excludes non-product entries such as postage, discounts and adjustments, identified by stock-code pattern.   The raw data is kept unchanged, and all queries use one filter so results stay consistent
 
 ## Dataset
 UK-based online retailer, Dec 2010–Dec 2011. Each row is a line item 
