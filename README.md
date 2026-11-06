@@ -35,22 +35,18 @@ back to its matching original order to confirm, then excluded
 extreme-quantity returns to get a cleaner view of real returns 
 behavior.
 
-**3. Also found**: "REGENCY CAKESTAND 3 TIER" and "WHITE HANGING HEART 
-T-LIGHT HOLDER" appear in both the top-revenue and top-returns 
-lists — meaning gross revenue overstates their actual profitability.
+**3**.Checked Revenue by country
 
-**4**.Checked Revenue by country
-
-**5**.**Revenue trend over time (by month)**:
+**4**.**Revenue trend over time (by month)**:
 Net product revenue: after returns and cancellations, excluding non-product entries such as postage and adjustments.
 
 - Finding: Monthly revenue moved in a moderate range from December 2010 to August 2011, then rose sharply from September to    November 2011, peaking in November. December 2011 appears to drop, but the data ends on 9 December. Revenue per day with     sales in December 2011 is almost the same as November’s, so the drop is largely explained by missing days, not weaker
   sales.
 - Recommendation: Plan stock, staffing and delivery capacity ahead of September to November, the strongest period in this      dataset. Report December by revenue per day, not by monthly total, until a full month of data is available. With one year    of data, confirm the seasonal pattern against a second year.
 
-**6**. **Also found**: Verified that September–November 2011 are complete months (consistent day coverage), confirming the revenue growth across this period is genuine — not an artifact of partial-month data, unlike December.
+**5**. **Also found**: Verified that September–November 2011 are complete months (consistent day coverage), confirming the revenue growth across this period is genuine — not an artifact of partial-month data, unlike December.
 
-**7. Was November's revenue spike driven by a few large orders or 
+**6. Was November's revenue spike driven by a few large orders or 
 broad growth?**
 The two largest individual orders in November (£52,940 and £50,653) 
 stood out from the rest, but together they represented only ~7.2% 
@@ -59,14 +55,14 @@ the growth was broad-based, not concentrated in a handful of
 transactions. This contrasts with the returns outlier above, where 
 a single order accounted for effectively 100% of the anomaly.
 
-**8. Which customers are the most valuable?**
+**7. Which customers are the most valuable?**
 Ranked customers by total spend, excluding ~20% of revenue tied to 
 transactions with no CustomerID recorded (a data quality gap worth 
 flagging on its own). Verified the top two customers' totals came 
 from genuine repeat purchasing (74 and 60 separate orders 
 respectively), not a single bulk transaction.
 
-**9.:Calculated the Average Order Value** :
+**8.:Calculated the Average Order Value** :
 Calculating average order value (total spend ÷ number of distinct 
 orders, not a plain AVG() on revenue — which would average per 
 product line instead of per order) revealed customers aren't 
