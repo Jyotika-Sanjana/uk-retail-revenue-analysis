@@ -27,13 +27,19 @@ so the filter generalizes to new junk codes too.
 
 **2. How much revenue is lost to returns, and which products are 
 most affected?**
-The product with the largest apparent "return loss" 
-(PAPER CRAFT, LITTLE BIRDIE, -£168K) turned out to be a single 
-wholesale order of 80,995 units cancelled 12 minutes after purchase 
-— not a genuine customer-return pattern. Traced the cancellation 
-back to its matching original order to confirm, then excluded 
-extreme-quantity returns to get a cleaner view of real returns 
-behavior.
+- Finding: The product with the largest apparent "return loss" 
+  (PAPER CRAFT, LITTLE BIRDIE, -£168K) turned out to be a single 
+  wholesale order of 80,995 units cancelled 12 minutes after purchase 
+  not a genuine customer-return pattern. Traced the cancellation 
+  back to its matching original order to confirm, then excluded 
+  extreme-quantity returns to get a cleaner view of real returns 
+  behavior.
+- Recommendation:
+    1. Report bulk orders (above a quantity threshold) separately from regular orders, so one large order cannot dominate a returns report.
+    2. Flag cancellations that closely match an original order within a short window as likely order errors, not customer returns, and exclude them from return-rate analysis. A shipped/not-shipped field would let the business confirm this.
+    3. Evaluate product returns by return rate (returned value ÷ sold value), not by total returned value, so popular products are not mistaken for problem products.
+    4. Prevention idea (to test): an order review step with a high-quantity warning
+Limitation: the dataset has no shipping status or return reasons, so cancelled-before-dispatch is inferred from timing and matching quantities, not confirmed.
 
 **3**.Checked Revenue by country
 
