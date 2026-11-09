@@ -77,7 +77,10 @@ valuable in the same way: some (e.g., Customer 12415, 24 orders,
 (e.g., Customer 14911, 243 orders, £547 avg) drive value through 
 purchase frequency. This distinction matters for how a business 
 would target retention vs. acquisition for each group.
-
+Recommendation:
+- Treat the two groups differently. Frequent buyers are best served with retention efforts such as reorder reminders or loyalty offers. High-value occasional buyers may be wholesale-type customers, so they may respond better to account management, bulk pricing or restock reminders. Check this before acting.
+- Investigate why about a fifth of revenue has no customer ID (guest checkout or recording errors) and report customer metrics with that gap stated. If it’s guest checkout, consider an optional account step instead of a mandatory one, to avoid losing sales.
+- Limitation: results describe the top customers by spend and exclude revenue with no customer ID, so they do not represent the whole customer base
 ## Tools
 PostgreSQL, pgAdmin
 
