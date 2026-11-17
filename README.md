@@ -1,5 +1,3 @@
-# uk-retail-revenue-analysis
-
 # UK Online Retail — SQL Revenue & Returns Analysis
 
 ## Overview
@@ -75,8 +73,20 @@ would target retention vs. acquisition for each group.
   1. Treat the two groups differently. Frequent buyers are best served with retention efforts such as reorder reminders or loyalty offers. High-value occasional buyers may be wholesale-type customers, so they may respond better to account management, bulk pricing or restock reminders. Check this before acting.
   2. Investigate why about a fifth of revenue has no customer ID (guest checkout or recording errors) and report customer metrics with that gap stated. If it’s guest checkout, consider an optional account step instead of a mandatory one, to avoid losing sales.
 - Limitation: results describe the top customers by spend and exclude revenue with no customer ID, so they do not represent the whole customer base
+
+### 6. Which products have the highest return rate?
+- **Finding:** Ranking by returned value favors popular products, so I ranked by return rate (returned value ÷ sold value), excluding quantities beyond ±999 and products with sales of £1,000 or less. The top of the list was misleading in two cases. The pantry chopping board ranked second at about 82%, but about 99.6% of its returned value came from two returns (756 and 186 units) that each reversed an earlier full order, 22 hours and 9 days later; its other returns were single units. For the Babushka stacking tins (92%), a 240-unit credit note and sale entered one minute apart inflated the rate; without that pair it fell to about 40% on only £70 of returns.
+- **Recommendation:**
+  1. Judge product returns by number of return orders and typical return size, as well as value.
+  2. Match large returns to earlier sales of the same product, quantity and price, and report them as full-order reversals.
+  3. Capture a return reason and shipping status.
+- **Limitation:** the dataset has no return reasons, so reversals could be returns, credits or cancellations. The 756-unit and 240-unit reversals fall below the 1,000-unit cutoff, so one quantity cutoff is not a reliable fix.
 ## Tools
-PostgreSQL, pgAdmin
+PostgreSQL, pgAdmin. SQL features used: regular expressions, date functions, CASE, subqueries, PERCENTILE_CONT, LEFT/INNER joins
 
 ## Files
-- `da_practice.sql` — all queries, in order, with comments
+- `sql/01_revenue_and_data_cleaning.sql`
+- `sql/02_revenue_trends_and_orders.sql`
+- `sql/03_returns_and_outliers.sql`
+- `sql/04_return_rate_analysis.sql`
+- `sql/05_customer_value.sql`
