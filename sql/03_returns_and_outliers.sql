@@ -46,7 +46,8 @@ SELECT
   MAX("Quantity") AS "Max",
   AVG("Quantity") AS "Avg"
 FROM retail_project."OnlineRetailCSV"
-WHERE "Quantity" > 0;
+WHERE "Quantity" > 0
+  AND "StockCode" ~ '[0-9]';
 
 -- Preview: label each sale row as Small (under 24 units), Medium (24-99) or Bulk (100+)
 SELECT
@@ -58,6 +59,7 @@ SELECT
   END AS "OrderSize"
 FROM retail_project."OnlineRetailCSV"
 WHERE "Quantity" > 0
+  AND "StockCode" ~ '[0-9]'
 LIMIT 20;
 
 -- Number of sale rows in each order-size bucket
@@ -70,18 +72,20 @@ SELECT
   COUNT(*) AS "No.of Rows"
 FROM retail_project."OnlineRetailCSV"
 WHERE "Quantity" > 0
+  AND "StockCode" ~ '[0-9]'
 GROUP BY "OrderSize"
 ORDER BY "No.of Rows" DESC;
 
 -- Split the Bulk bucket (100+ units) into slices to see where the extreme quantities sit
 SELECT
-	CASE
-		WHEN "Quantity" >= 10000 THEN '10000+'
-		WHEN "Quantity" >= 1000  THEN '1000-9999'
-		WHEN "Quantity" >= 100   THEN '100-999'
-	END AS "BulkSlice",
-	COUNT(*) AS "Rows"
+  CASE
+    WHEN "Quantity" >= 10000 THEN '10000+'
+    WHEN "Quantity" >= 1000  THEN '1000-9999'
+    WHEN "Quantity" >= 100   THEN '100-999'
+  END AS "BulkSlice",
+  COUNT(*) AS "Rows"
 FROM retail_project."OnlineRetailCSV"
 WHERE "Quantity" >= 100
+  AND "StockCode" ~ '[0-9]'
 GROUP BY "BulkSlice"
 ORDER BY "BulkSlice";
