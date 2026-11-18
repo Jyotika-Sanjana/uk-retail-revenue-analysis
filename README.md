@@ -35,7 +35,7 @@ Source: [UCI Online Retail](https://archive.ics.uci.edu/dataset/352/online-retai
 
 **Limitation:** The dataset has no shipping status or return reasons, so cancelled-before-dispatch is inferred from timing and matching quantities, not confirmed. A single quantity cutoff (1,000 units) caught this outlier but missed smaller reversals of full orders, such as 756 and 240 units, so matching returns to their original sales is more reliable than a cutoff.
 
-**Method note: order-size cutoffs.** Sale quantities have a median of 3, a 90th percentile of 24, a 99th percentile of 100 and a maximum of 80,995. Of the 6,769 rows with 100 or more units, 6,640 fall between 100 and 999, 126 between 1,000 and 9,999, and 3 at 10,000 or more. A cutoff of 100 would therefore discard many ordinary large orders, so I used percentiles to label Small, Medium and Bulk orders and checked where the extreme quantities sit.
+**Method note: order-size cutoffs.** Sale quantities have a median of 3, a 90th percentile of 24, a 99th percentile of 100 and a maximum of 80,995. Of the 6,757 rows with 100 or more units, 6,632 fall between 100 and 999, 122 between 1,000 and 9,999, and 3 at 10,000 or more. A cutoff of 100 would therefore discard many ordinary large orders, so I used percentiles to label Small, Medium and Bulk orders and checked where the extreme quantities sit.
 
 ### 3. Which products have the highest return rate?
 **Finding:** Ranking by returned value favors popular products, so I ranked by return rate (returned value ÷ sold value), excluding quantities beyond ±999 and products with sales of £1,000 or less. The top of the list was misleading in two cases.
