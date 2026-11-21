@@ -43,3 +43,40 @@ WHERE "StockCode" ~ '[0-9]' AND "CustomerID" IS NOT NULL
 GROUP BY "CustomerID"
 ORDER BY "TotalSpend" DESC
 LIMIT 10;
+
+-- ===== Part 2: Missing customer IDs =====
+
+-- Baseline for rows with a customer ID: total spend, number of orders and average line-item spend
+SELECT 
+    SUM("Quantity"*"UnitPrice") AS "TotalSpend",
+    COUNT(DISTINCT "InvoiceNo") AS "NumOrders",
+    AVG("Quantity"*"UnitPrice") AS "AvgLineItemSpendWithID"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]' AND "CustomerID" IS NOT NULL;
+
+-- How many product rows have a customer ID, and how many do not
+-- (COUNT(*) counts every row; COUNT("CustomerID") skips NULLs)
+SELECT
+  COUNT(*) AS "AllRows",
+  COUNT("CustomerID") AS "RowsWithCustomerID",
+  COUNT(*) - COUNT("CustomerID") AS "RowsWithoutID"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]';
+
+-- Share of revenue from rows with and without a customer ID
+SELECT
+  ROUND(100.0 * SUM(CASE WHEN "CustomerID" IS NOT NULL THEN "Quantity" * "UnitPrice" END)
+        / SUM("Quantity" * "UnitPrice"), 2) AS "PctRevenueWithID",
+  ROUND(100.0 * SUM(CASE WHEN "CustomerID" IS  NULL THEN "Quantity" * "UnitPrice" END)
+        / SUM("Quantity" * "UnitPrice"), 2) AS "PctRevenueNoID"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]';
+
+-- Compare rows with and without a customer ID: row count and average line value
+SELECT
+  (CASE WHEN "CustomerID" IS NULL THEN 'True' ELSE 'False' END) AS "NoID",
+  COUNT(*) AS "Rows",
+  AVG("Quantity" * "UnitPrice") AS "AvgLineValue"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "NoID";
