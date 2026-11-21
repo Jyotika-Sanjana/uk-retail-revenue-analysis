@@ -10,7 +10,7 @@ Analysis of a real e-commerce transaction dataset (UCI Online Retail, ~540K rows
 - Ranking products by return rate can also mislead: for two of the highest-ranked products, reversals of earlier full orders produced most of the "returns".
 - Monthly revenue rose sharply from September to November 2011. The December drop reflects missing days (the data ends on 9 December), and revenue per day with sales is almost the same as November's.
 - November's spike was broad-based: the two largest orders made up only ~7.2% of the month's revenue.
-- Top customers split into frequent low-basket buyers and infrequent high-basket buyers, and about 20% of revenue has no customer ID.
+- Top customers split into frequent low-basket buyers and infrequent high-basket buyers, about 15% of revenue (about a quarter of rows) has no customer ID.
 
 ## Dataset
 UK-based online retailer, Dec 2010–Dec 2011. Each row is a line item in a customer order (invoice number, product, quantity, price, customer, country).
@@ -62,13 +62,15 @@ Source: [UCI Online Retail](https://archive.ics.uci.edu/dataset/352/online-retai
 **Finding:** The two largest individual orders in November (£52,940 and £50,653) stood out from the rest, but together they represented only ~7.2% of the month's total revenue (£103,594 of £1,433,882). This suggests the growth was broad-based, not concentrated in a handful of transactions. It contrasts with the returns outlier in section 2, where a single order accounted for effectively 100% of the anomaly.
 
 ### 6. Which customers are the most valuable?
-**Finding:** I ranked customers by total spend, excluding ~20% of revenue tied to transactions with no CustomerID recorded (a data quality gap worth flagging on its own). I verified that the top two customers' totals came from genuine repeat purchasing (74 and 60 separate orders respectively), not a single bulk transaction.
+**Finding:** I ranked customers by total spend, excluding about 15% of revenue (about a quarter of rows) tied to transactions with no CustomerID recorded (a data quality gap worth flagging on its own). I verified that the top two customers' totals came from genuine repeat purchasing (74 and 60 separate orders respectively), not a single bulk transaction.
+
+Rows without a customer ID average about £11 per line item versus about £20 for rows with one, so they carry a smaller share of revenue (about 15%) than of rows (about 25%). The data has no field explaining why an ID is missing, so guest checkout is one possible explanation, not a confirmed one.
 
 I then calculated average order value as total spend ÷ number of distinct orders, not a plain `AVG()` on revenue, which would average per product line instead of per order. This showed that customers aren't valuable in the same way: some (e.g., Customer 12415, 24 orders, £5,151 average) are infrequent high-ticket buyers, while others (e.g., Customer 14911, 243 orders, £547 average) drive value through purchase frequency. This distinction matters for how a business would target retention versus acquisition for each group.
 
 **Recommendation:**
 1. Treat the two groups differently. Frequent buyers are best served with retention efforts such as reorder reminders or loyalty offers. High-value occasional buyers may be wholesale-type customers, so they may respond better to account management, bulk pricing or restock reminders. Check this before acting.
-2. Investigate why about a fifth of revenue has no customer ID (guest checkout or recording errors) and report customer metrics with that gap stated. If it's guest checkout, consider an optional account step instead of a mandatory one, to avoid losing sales.
+2. Investigate why about 15% of revenue (a quarter of rows) has no customer ID. If it's guest checkout, consider an optional account step instead of a mandatory one, to avoid losing sales.
 
 **Limitation:** Results describe the top customers by spend and exclude revenue with no customer ID, so they do not represent the whole customer base.
 
@@ -84,4 +86,4 @@ PostgreSQL, pgAdmin. SQL features used: regular expressions, date functions, CAS
 - `sql/02_revenue_trends_and_orders.sql` — monthly revenue, revenue per day, data-coverage checks, November order concentration
 - `sql/03_returns_and_outliers.sql` — return losses, the PAPER CRAFT outlier, percentile-based order-size buckets
 - `sql/04_return_rate_analysis.sql` — return rate by product, order counts, checks on suspicious products
-- `sql/05_customer_value.sql` — top customers, repeat orders, average order value
+- `sql/05_customer_value.sql` — top customers, repeat orders, average order value, and missing customer IDs
