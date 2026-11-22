@@ -1,7 +1,7 @@
 -- --------------------------------------------------------------
 -- 04_return_rate_analysis.sql
 -- Project: UK Online Retail Revenue Analysis (PostgreSQL)
--- Purpose: return rate by product, order counts behind each rate, and checks on suspicious products.
+-- Purpose: Purpose: return rate by product, order counts behind each rate, NULL handling and coverage checks, and checks on suspicious products.
 -- --------------------------------------------------------------
 
 -- ===== Part 1: Return rate by product =====
@@ -134,3 +134,78 @@ WHERE "Description" = 'SET OF 3 BABUSHKA STACKING TINS'
   AND "Quantity" BETWEEN -999 AND 999
   AND ABS("Quantity") <> 240
 GROUP BY "Description";
+
+-- ===== Part 3: NULL handling and return-rate coverage =====
+
+-- Return rate for the first 10 products (no ORDER BY, so this is a sample to inspect).
+-- NULLIF in the denominator avoids division by zero when sold value is 0.
+-- Products with no return rows show NULL, because the numerator is NULL when no row matches the CASE.
+SELECT
+  "Description",
+  ROUND(100.0 * -SUM(CASE WHEN "Quantity" < 0 THEN "Quantity" * "UnitPrice" END)
+        / NULLIF(SUM(CASE WHEN "Quantity" > 0 THEN "Quantity" * "UnitPrice" END), 0), 2) AS "ReturnRatePct"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "Description"
+LIMIT 10;
+
+-- Same return rate with COALESCE in the numerator, so products with no returns show 0 instead of NULL.
+-- NULLIF still protects against a zero denominator (products with no sales cannot get a rate).
+SELECT
+  "Description",
+  ROUND(100.0 * COALESCE(-SUM(CASE WHEN "Quantity" < 0 THEN "Quantity" * "UnitPrice" END), 0)
+        / NULLIF(SUM(CASE WHEN "Quantity" > 0 THEN "Quantity" * "UnitPrice" END), 0), 2) AS "ReturnRatePct"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "Description"
+ORDER BY "Description"
+LIMIT 10;
+
+-- Sold and returned value for every product, with no sales filter.
+-- NULL in Sold means the product has no sale rows; NULL in Returned means it has no return rows.
+SELECT
+"Description",
+SUM(CASE WHEN "Quantity" > 0 THEN "Quantity" * "UnitPrice" END) AS "Sold",
+SUM(CASE WHEN "Quantity" < 0 THEN "Quantity" * "UnitPrice" END) AS "Returned"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "Description";
+
+-- How many products have no returns, and how many have no sales (or a sold value of zero).
+-- Products with no sales cannot get a return rate, because there is nothing to divide by.
+SELECT
+  COUNT(*) AS "Products",
+  COUNT(*) FILTER (WHERE "Returned" IS NULL) AS "ProductsWithNoReturns",
+  COUNT(*) FILTER (WHERE "Sold" IS NULL OR "Sold" = 0) AS "ProductsWithNoSales"
+FROM (
+  SELECT
+    "Description",
+    SUM(CASE WHEN "Quantity" > 0 THEN "Quantity" * "UnitPrice" END) AS "Sold",
+    SUM(CASE WHEN "Quantity" < 0 THEN "Quantity" * "UnitPrice" END) AS "Returned"
+  FROM retail_project."OnlineRetailCSV"
+  WHERE "StockCode" ~ '[0-9]'
+  GROUP BY "Description"
+) AS t;
+
+-- Share of products with at least one return, by sales band (under 100, 100-999, 1000+).
+-- COUNT("Returned") skips NULLs, so it counts only products that have returns.
+-- NOTE: integer vs decimal division (PostgreSQL). Whole number / whole number drops the decimals (7 / 2 = 3);
+-- use 100.0 * a / b for percentages, or ROUND() receives an already-truncated value.
+SELECT
+  CASE WHEN "Sold" >= 1000 THEN '1000+'
+       WHEN "Sold" >= 100  THEN '100-999'
+       ELSE 'Under 100' END AS "SalesBand",
+  COUNT(*) AS "Products",
+  COUNT("Returned") AS "ProductsWithReturns",
+  ROUND(100.0 * COUNT("Returned") / COUNT(*), 1) AS "PctWithReturns"
+FROM (
+  SELECT
+    "Description",
+    SUM(CASE WHEN "Quantity" > 0 THEN "Quantity" * "UnitPrice" END) AS "Sold",
+    SUM(CASE WHEN "Quantity" < 0 THEN "Quantity" * "UnitPrice" END) AS "Returned"
+  FROM retail_project."OnlineRetailCSV"
+  WHERE "StockCode" ~ '[0-9]'
+  GROUP BY "Description"
+) AS t
+WHERE "Sold" IS NOT NULL
+GROUP BY "SalesBand";
