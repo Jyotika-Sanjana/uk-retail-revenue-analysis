@@ -41,6 +41,7 @@ Source: [UCI Online Retail](https://archive.ics.uci.edu/dataset/352/online-retai
 **Finding:** Ranking by returned value favors popular products, so I ranked by return rate (returned value ÷ sold value), excluding quantities beyond ±999 and products with sales of £1,000 or less. The top of the list was misleading in two cases.
 - The pantry chopping board ranked second at about 82%, but about 99.6% of its returned value came from two returns (756 and 186 units) that each reversed an earlier full order, 22 hours and 9 days later. Its other returns were single units.
 - For the Babushka stacking tins (92%), a 240-unit credit note and sale entered one minute apart inflated the rate. Without that pair it fell to about 40% on only £70 of returns.
+- **Coverage:** Of 4,212 products, about half (2,109) have no returns at all, and 196 have no sales rows (or a sold value of zero), so no return rate can be calculated for them. These products may have been bought before the data starts in December 2010, or their names may differ between sale and return rows. Having at least one return is not by itself a warning sign: the share of products with a return rises with sales, from about 10.4% of products with under £100 in sales to about 34.9% for £100-999 and about 81.6% for £1,000 or more.
 
 **Recommendation:**
 1. Judge product returns by number of return orders and typical return size, as well as value.
@@ -48,6 +49,7 @@ Source: [UCI Online Retail](https://archive.ics.uci.edu/dataset/352/online-retai
 3. Capture a return reason and shipping status.
 
 **Limitation:** The dataset has no return reasons, so reversals could be returns, credits or cancellations. The 756-unit and 240-unit reversals fall below the 1,000-unit cutoff, so one quantity cutoff is not a reliable fix.
+Return rates are not calculated for products with no sales in the data, and products are matched by name, so name differences between sale and return rows could split a product.
 
 ### 4. How does revenue change over time (by month)?
 *Net product revenue: after returns and cancellations, excluding non-product entries such as postage and adjustments.*
@@ -79,11 +81,11 @@ I then calculated average order value as total spend ÷ number of distinct order
 - Check the other top-ranked products for the same pairs before calling any of them a problem product.
 
 ## Tools
-PostgreSQL, pgAdmin. SQL features used: regular expressions, date functions, CASE expressions, subqueries, `PERCENTILE_CONT`, aggregate `FILTER`.
+PostgreSQL, pgAdmin. SQL features used: regular expressions, date functions, CASE expressions, subqueries, PERCENTILE_CONT, aggregate FILTER, NULL handling (COALESCE, NULLIF)
 
 ## Files
 - `sql/01_revenue_and_data_cleaning.sql` — revenue by product and country, filtering out non-product stock codes
 - `sql/02_revenue_trends_and_orders.sql` — monthly revenue, revenue per day, data-coverage checks, November order concentration
 - `sql/03_returns_and_outliers.sql` — return losses, the PAPER CRAFT outlier, percentile-based order-size buckets
-- `sql/04_return_rate_analysis.sql` — return rate by product, order counts, checks on suspicious products
+- - `sql/04_return_rate_analysis.sql` — return rate by product, order counts, NULL handling and coverage checks, checks on suspicious products
 - `sql/05_customer_value.sql` — top customers, repeat orders, average order value, and missing customer IDs
