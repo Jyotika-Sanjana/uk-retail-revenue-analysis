@@ -11,6 +11,7 @@ Analysis of a real e-commerce transaction dataset (UCI Online Retail, ~540K rows
 - Monthly revenue rose sharply from September to November 2011. The December drop reflects missing days (the data ends on 9 December), and revenue per day with sales is almost the same as November's.
 - November's spike was broad-based: the two largest orders made up only ~7.2% of the month's revenue.
 - Top customers split into frequent low-basket buyers and infrequent high-basket buyers, about 15% of revenue (about a quarter of rows) has no customer ID.
+- Revenue is concentrated on weekdays (Thursday strongest, Sunday weakest) and between 10:00 and 15:00, which is consistent with business buyers; the data has no Saturday rows.
 
 ## Dataset
 UK-based online retailer, Dec 2010–Dec 2011. Each row is a line item in a customer order (invoice number, product, quantity, price, customer, country).
@@ -63,7 +64,14 @@ Return rates are not calculated for products with no sales in the data, and prod
 ### 5. Was November's revenue spike driven by a few large orders or broad growth?
 **Finding:** The two largest individual orders in November (£52,940 and £50,653) stood out from the rest, but together they represented only ~7.2% of the month's total revenue (£103,594 of £1,433,882). This suggests the growth was broad-based, not concentrated in a handful of transactions. It contrasts with the returns outlier in section 2, where a single order accounted for effectively 100% of the anomaly.
 
-### 6. Which customers are the most valuable?
+### 6. Which days and hours drive the most revenue?
+**Finding:** Revenue is concentrated on weekdays and in working hours. Thursday is the strongest day, at about £39K per day with sales, followed by Tuesday (about £38K) and Monday (about £35K). Sunday is the weakest day with sales, at about £16K per day, roughly 41% of Thursday. Each weekday has a similar number of days with sales (47 to 53), so the comparison is fair. The dataset has no Saturday rows. By hour, revenue peaks between 10:00 and 15:00, with the highest total at 12:00 (about £1.4M), and falls steeply after 18:00 (about £135K at 18:00 and £16K at 20:00). There are no orders between 21:00 and 05:00. The 06:00 hour has negative revenue because it contains only returns or cancellations.
+
+**Recommendation:** Schedule order processing, customer support and dispatch cut-offs around the Tuesday to Thursday daytime peak. Test whether Sunday or evening promotions add revenue before investing in them.
+
+**Limitation:** The pattern is consistent with business buyers placing orders during the working day, but the dataset has no customer-type field, so this is a hypothesis. The missing Saturday could mean no trading or no recorded data, and the data cannot tell which. Times are as recorded, and the data covers only one year.
+
+### 7. Which customers are the most valuable?
 **Finding:** I ranked customers by total spend, excluding about 15% of revenue (about a quarter of rows) tied to transactions with no CustomerID recorded (a data quality gap worth flagging on its own). I verified that the top two customers' totals came from genuine repeat purchasing (74 and 60 separate orders respectively), not a single bulk transaction.
 
 Rows without a customer ID average about £11 per line item versus about £20 for rows with one, so they carry a smaller share of revenue (about 15%) than of rows (about 25%). The data has no field explaining why an ID is missing, so guest checkout is one possible explanation, not a confirmed one.
@@ -76,16 +84,17 @@ I then calculated average order value as total spend ÷ number of distinct order
 
 **Limitation:** Results describe the top customers by spend and exclude revenue with no customer ID, so they do not represent the whole customer base.
 
+
 ## Next steps
 - Find reversal pairs automatically (match each return to an earlier sale of the same product, quantity and price) and re-run the return-rate ranking without them.
 - Check the other top-ranked products for the same pairs before calling any of them a problem product.
 
 ## Tools
-PostgreSQL, pgAdmin. SQL features used: regular expressions, date functions, CASE expressions, subqueries, PERCENTILE_CONT, aggregate FILTER, NULL handling (COALESCE, NULLIF)
+PostgreSQL, pgAdmin. SQL features used: regular expressions, date functions (TO_DATE, TO_CHAR, EXTRACT, DATE_TRUNC), CASE expressions, subqueries, PERCENTILE_CONT, aggregate FILTER, NULL handling (COALESCE, NULLIF)
 
 ## Files
 - `sql/01_revenue_and_data_cleaning.sql` — revenue by product and country, filtering out non-product stock codes
-- `sql/02_revenue_trends_and_orders.sql` — monthly revenue, revenue per day, data-coverage checks, November order concentration
+- `sql/02_revenue_trends_and_orders.sql` — monthly revenue, revenue per day, day-of-week and hour-of-day patterns, data-coverage checks, November order concentration
 - `sql/03_returns_and_outliers.sql` — return losses, the PAPER CRAFT outlier, percentile-based order-size buckets
 - - `sql/04_return_rate_analysis.sql` — return rate by product, order counts, NULL handling and coverage checks, checks on suspicious products
 - `sql/05_customer_value.sql` — top customers, repeat orders, average order value, and missing customer IDs
