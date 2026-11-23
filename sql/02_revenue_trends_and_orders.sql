@@ -51,3 +51,45 @@ SELECT SUM("Quantity"*"UnitPrice") AS "TopordersTotal"
 FROM retail_project."OnlineRetailCSV"
 WHERE "InvoiceNo" IN ('574941', '576365')
 AND "StockCode" ~ '[0-9]';
+
+
+-- Total revenue by day of week (0 = Sunday ... 6 = Saturday); Saturday has no rows in this dataset
+SELECT
+  EXTRACT(DOW FROM TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI')) AS "DayOfWeek",
+  SUM("Quantity" * "UnitPrice") AS "Revenue"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "DayOfWeek"
+ORDER BY "DayOfWeek";
+
+
+-- Revenue per day with sales, by day of week (total revenue / number of distinct days with sales)
+SELECT
+  EXTRACT(DOW FROM TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI')) AS "DayOfWeek",
+  COUNT(DISTINCT TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI')) AS "DaysWithSales",
+  SUM("Quantity" * "UnitPrice")
+    / COUNT(DISTINCT TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI')) AS "RevenuePerDay"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "DayOfWeek"
+ORDER BY "DayOfWeek";
+
+-- Revenue by hour of day (as recorded in InvoiceDate); no rows exist for hours 0-5 and 21-23.
+-- Hour 6 is negative because it contains only returns/cancellations.
+SELECT
+  EXTRACT(HOUR FROM TO_TIMESTAMP("InvoiceDate", 'MM/DD/YYYY HH24:MI')) AS "Hour",
+  SUM("Quantity" * "UnitPrice") AS "Revenue"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "Hour"
+ORDER BY "Hour";
+
+-- Monthly revenue using DATE_TRUNC (returns the first day of each month, with the session time zone attached);
+-- totals match the TO_CHAR 'YYYY-MM' version above
+SELECT
+  DATE_TRUNC('month', TO_DATE("InvoiceDate", 'MM/DD/YYYY HH24:MI')) AS "Month",
+  SUM("Quantity" * "UnitPrice") AS "MonthlyRevenue"
+FROM retail_project."OnlineRetailCSV"
+WHERE "StockCode" ~ '[0-9]'
+GROUP BY "Month"
+ORDER BY "Month";
